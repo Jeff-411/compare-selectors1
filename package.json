@@ -1,0 +1,19 @@
+{
+  "name": "compare-selectors1",
+  "version": "1.0.0",
+  "description": "Tool for analyzing differences between Outlook HTML snapshots",
+  "type": "module",
+  "main": "analyze-snapshots.js",
+  "scripts": {
+    "analyze": "node analyze-snapshots.js",
+    "test": "node analyze-snapshots.js --before ./html/inboxA.html --after ./html/inboxB.html"
+  },
+  "dependencies": {
+    "jsdom": "^26.1.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

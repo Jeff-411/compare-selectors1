@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outlook HTML Snapshot Analyzer</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #0078d4;
+      }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+      }
+      .full-width {
+        grid-column: 1 / -1;
+      }
+      textarea {
+        width: 100%;
+        height: 300px;
+        font-family: monospace;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      button {
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:hover {
+        background-color: #006abc;
+      }
+      .warning {
+        background-color: #fff3cd;
+        padding: 15px;
+        border-left: 4px solid #ffc107;
+        margin-bottom: 20px;
+      }
+      .results-container {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 20px;
+        margin-top: 20px;
+        max-height: 800px;
+        overflow: auto;
+      }
+      .results-container h2 {
+        margin-top: 0;
+      }
+      pre {
+        background: #f6f8fa;
+        border-radius: 3px;
+        padding: 10px;
+        overflow: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .score-high {
+        color: #107c10;
+      }
+      .score-medium {
+        color: #ff8c00;
+      }
+      .score-low {
+        color: #d83b01;
+      }
+      .status-changed {
+        color: #0078d4;
+        font-weight: bold;
+      }
+      .status-added {
+        color: #107c10;
+        font-weight: bold;
+      }
+      .status-removed {
+        color: #d83b01;
+        font-weight: bold;
+      }
+      .loading {
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: #666;
+      }
+      .file-input-container {
+        margin-bottom: 10px;
+      }
+      .file-input-container label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      .tab-container {
+        margin-top: 20px;
+      }
+      .tab-buttons {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+      }
+      .tab-button {
+        background: none;
+        border: none;
+        padding: 10px 15px;
+        color: #333;
+        cursor: pointer;
+        margin-right: 5px;
+        font-weight: normal;
+      }
+      .tab-button.active {
+        border-bottom: 3px solid #0078d4;
+        color: #0078d4;
+        font-weight: 600;
+      }
+      .tab-content {
+        display: none;
+        padding: 20px 0;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      #copy-recommendations {
+        float: right;
+        background-color: #107c10;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Outlook HTML Snapshot Analyzer</h1>
+
+    <div class="warning">
+      <p>
+        <strong>Note:</strong> This tool performs structure-based differential analysis of Outlook
+        HTML snapshots to identify stable selectors and DOM anchors between versions. All processing
+        happens locally in your browser; no HTML content is sent to any server.
+      </p>
+    </div>
+
+    <div class="container">
+      <div>
+        <h2>Before HTML</h2>
+        <div class="file-input-container">
+          <label for="before-file">Upload HTML File:</label>
+          <input type="file" id="before-file" accept=".html,.htm" />
+        </div>
+        <textarea id="before-html"> </textarea>
+      </div>
+
+      <div>
+        <h2>After HTML</h2>
+        <div class="file-input-container">
+          <label for="after-file">Upload HTML File:</label>
+          <input type="file" id="after-file" accept=".html,.htm" />
+        </div>
+        <textarea id="after-html"></textarea>
+      </div>
+
+      <div class="full-width">
+        <button id="analyze-button">Analyze Differences</button>
+        <span id="progress" style="margin-left: 10px"></span>
+      </div>
+    </div>
+
+    <div id="results-section" class="full-width results-container" style="display: none">
+      <div class="tab-container">
+        <div class="tab-buttons">
+          <button class="tab-button active" data-tab="summary-tab">Summary</button>
+          <button class="tab-button" data-tab="stable-attributes-tab">Stable Attributes</button>
+          <button class="tab-button" data-tab="changed-selectors-tab">Changed Selectors</button>
+          <button class="tab-button" data-tab="recommendations-tab">Recommendations</button>
+          <button class="tab-button" data-tab="raw-results-tab">Raw Results</button>
+        </div>
+
+        <div class="tab-content active" id="summary-tab">
+          <h2>Analysis Summary</h2>
+          <div id="summary-content"></div>
+        </div>
+
+        <div class="tab-content" id="stable-attributes-tab">
+          <h2>Stable Attributes Analysis</h2>
+          <div id="stable-attributes-content"></div>
+        </div>
+
+        <div class="tab-content" id="changed-selectors-tab">
+          <h2>Changed Selectors</h2>
+          <div id="changed-selectors-content"></div>
+        </div>
+
+        <div class="tab-content" id="recommendations-tab">
+          <h2>Recommended Anchors</h2>
+          <button id="copy-recommendations">Copy to Clipboard</button>
+          <div id="recommendations-content"></div>
+        </div>
+
+        <div class="tab-content" id="raw-results-tab">
+          <h2>Raw Analysis Results</h2>
+          <pre id="raw-results-content"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load the analyzer script -->
+    <script src="outlook-diff-analyzer.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // File input handlers
+        document.getElementById('before-file').addEventListener('change', e => {
+          const file = e.target.files[0]
+          if (file) {
+            const reader = new FileReader()
+            reader.onload = event => {
+              document.getElementById('before-html').value = event.target.result
+            }
+            reader.readAsText(file)
+          }
+        })
+
+        document.getElementById('after-file').addEventListener('change', e => {
+          const file = e.target.files[0]
+          if (file) {
+            const reader = new FileReader()
+            reader.onload = event => {
+              document.getElementById('after-html').value = event.target.result
+            }
+            reader.readAsText(file)
+          }
+        })
+
+        // Tab navigation
+        document.querySelectorAll('.tab-button').forEach(button => {
+          button.addEventListener('click', () => {
+            // Deactivate all tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+              btn.classList.remove('active')
+            })
+            document.querySelectorAll('.tab-content').forEach(content => {
+              content.classList.remove('active')
+            })
+
+            // Activate selected tab
+            button.classList.add('active')
+            const tabId = button.dataset.tab
+            document.getElementById(tabId).classList.add('active')
+          })
+        })
+
+        // Analysis button
+        document.getElementById('analyze-button').addEventListener('click', async () => {
+          const beforeHTML = document.getElementById('before-html').value.trim()
+          const afterHTML = document.getElementById('after-html').value.trim()
+
+          if (!beforeHTML || !afterHTML) {
+            alert('Please provide both before and after HTML content')
+            return
+          }
+
+          // Show progress
+          const progressEl = document.getElementById('progress')
+          progressEl.textContent = 'Analyzing...'
+
+          // Defer execution to allow UI to update
+          setTimeout(() => {
+            try {
+              // Perform analysis
+              const results = window.OutlookDOMDiff.analyzeChanges(beforeHTML, afterHTML)
+
+              // Display results
+              displayResults(results)
+
+              // Show results section
+              document.getElementById('results-section').style.display = 'block'
+
+              // Clear progress
+              progressEl.textContent = 'Analysis complete!'
+
+              // Scroll to results
+              document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' })
+            } catch (error) {
+              progressEl.textContent = ''
+              alert(`Error analyzing HTML: ${error.message}`)
+              console.error(error)
+            }
+          }, 100)
+        })
+
+        // Copy recommendations button
+        document.getElementById('copy-recommendations').addEventListener('click', () => {
+          const recommendationsEl = document.getElementById('recommendations-content')
+          const recommendationsText = recommendationsEl.textContent
+
+          navigator.clipboard
+            .writeText(recommendationsText)
+            .then(() => {
+              alert('Recommendations copied to clipboard!')
+            })
+            .catch(err => {
+              console.error('Could not copy text: ', err)
+              alert('Failed to copy. Please select and copy manually.')
+            })
+        })
+      })
+
+      function displayResults(results) {
+        // Raw results
+        document.getElementById('raw-results-content').textContent = JSON.stringify(
+          results,
+          null,
+          2
+        )
+
+        // Summary
+        const summaryHTML = createSummaryHTML(results)
+        document.getElementById('summary-content').innerHTML = summaryHTML
+
+        // Stable attributes
+        const stableAttributesHTML = createStableAttributesHTML(results.stableAttributes)
+        document.getElementById('stable-attributes-content').innerHTML = stableAttributesHTML
+
+        // Changed selectors
+        const changedSelectorsHTML = createChangedSelectorsHTML(results.changedSelectors)
+        document.getElementById('changed-selectors-content').innerHTML = changedSelectorsHTML
+
+        // Recommendations
+        const recommendationsHTML = createRecommendationsHTML(results.recommendedAnchors)
+        document.getElementById('recommendations-content').innerHTML = recommendationsHTML
+      }
+
+      function createSummaryHTML(results) {
+        const changedCount = results.changedSelectors.length
+        const reliableCount = Object.values(results.recommendedAnchors).filter(
+          a => a.isReliable
+        ).length
+
+        return `
+  <p>This analysis identified <strong>${changedCount} changed selectors</strong> and 
+     <strong>${reliableCount} reliable anchor points</strong> between the before and after snapshots.</p>
+  
+  <h3>Most Stable Attribute Types</h3>
+  <table>
+    <tr>
+      <th>Attribute</th>
+      <th>Stability Score</th>
+    </tr>
+    ${Object.entries(results.stableAttributes)
+      .sort((a, b) => parseFloat(b[1].stabilityScore) - parseFloat(a[1].stabilityScore))
+      .map(
+        ([attr, data]) => `
+        <tr>
+          <td>${attr}</td>
+          <td class="${getScoreClass(data.stabilityScore)}">${data.stabilityScore}%</td>
+        </tr>
+      `
+      )
+      .join('')}
+  </table>
+  
+  <h3>Summary Recommendations</h3>
+  <ul>
+    ${Object.entries(results.recommendedAnchors)
+      .filter(([_, data]) => data.isReliable)
+      .map(
+        ([feature, data]) => `
+        <li>Use <code style="background: #fff3cd; padding: 2px 4px;">${data.primarySelector}</code> 
+            as a reliable selector for ${feature} (${data.stabilityScore} score)</li>
+      `
+      )
+      .join('')}
+  </ul>
+`
+      }
+
+      function createStableAttributesHTML(stableAttributes) {
+        return `
+  <p>This table shows how stable different attribute types are between the two HTML snapshots.</p>
+  <table>
+    <tr>
+      <th>Attribute Type</th>
+      <th>Before Count</th>
+      <th>After Count</th>
+      <th>Common Count</th>
+      <th>Stability Score</th>
+    </tr>
+    ${Object.entries(stableAttributes)
+      .map(
+        ([attr, data]) => `
+      <tr>
+        <td>${attr}</td>
+        <td>${data.totalBefore}</td>
+        <td>${data.totalAfter}</td>
+        <td>${data.commonCount}</td>
+        <td class="${getScoreClass(data.stabilityScore)}">${data.stabilityScore}%</td>
+      </tr>
+    `
+      )
+      .join('')}
+  </table>
+  
+  <h3>Most Stable Values</h3>
+  ${Object.entries(stableAttributes)
+    .map(
+      ([attr, data]) => `
+    <div style="margin-bottom: 20px;">
+      <h4>${attr} (top 10)</h4>
+      <pre>${JSON.stringify(data.stableValues.slice(0, 10), null, 2)}</pre>
+    </div>
+  `
+    )
+    .join('')}
+`
+      }
+
+      function createChangedSelectorsHTML(changedSelectors) {
+        if (changedSelectors.length === 0) {
+          return '<p>No changes detected in monitored selectors.</p>'
+        }
+
+        return `
+  <p>These critical UI elements have changed between versions:</p>
+  <table>
+    <tr>
+      <th>Element</th>
+      <th>Status</th>
+      <th>Before Selector</th>
+      <th>After Selector</th>
+    </tr>
+    ${changedSelectors
+      .map(
+        change => `
+      <tr>
+        <td>${change.elementName}</td>
+        <td class="status-${change.status}">${change.status}</td>
+        <td>${change.before.found ? change.before.selector : 'N/A'}</td>
+        <td>${change.after.found ? change.after.selector : 'N/A'}</td>
+      </tr>
+    `
+      )
+      .join('')}
+  </table>
+  
+  <h3>Detailed Changes</h3>
+  <pre>${JSON.stringify(changedSelectors, null, 2)}</pre>
+`
+      }
+
+      function createRecommendationsHTML(recommendedAnchors) {
+        return `
+  <p>These selectors are recommended based on their stability across versions:</p>
+  <table>
+    <tr>
+      <th>Feature</th>
+      <th>Primary Selector</th>
+      <th>Stability Score</th>
+      <th>Type</th>
+      <th>Alternatives</th>
+    </tr>
+    ${Object.entries(recommendedAnchors)
+      .map(
+        ([feature, data]) => `
+      <tr>
+        <td>${feature}</td>
+        <td>${data.primarySelector || 'None found'}</td>
+        <td class="${getScoreClass(data.stabilityScore)}">${data.stabilityScore}</td>
+        <td>${data.selectorType || 'N/A'}</td>
+        <td>
+          <pre style="margin: 0">${JSON.stringify(data.alternativeSelectors || [], null, 2)}</pre>
+        </td>
+      </tr>
+    `
+      )
+      .join('')}
+  </table>
+  
+  <h3>JavaScript Integration</h3>
+  <pre>
+// Recommended selectors for Outlook integration
+const OUTLOOK_SELECTORS = {
+${Object.entries(recommendedAnchors)
+  .map(
+    ([feature, data]) =>
+      `  ${feature}: ${JSON.stringify(
+        {
+          primary: data.primarySelector || null,
+          alternatives: data.alternativeSelectors || [],
+          stabilityScore: data.stabilityScore,
+          selectorType: data.selectorType || 'unknown',
+        },
+        null,
+        2
+      )
+        .split('\n')
+        .join('\n  ')}`
+  )
+  .join(',\n')}
+};
+  </pre>
+`
+      }
+
+      function getScoreClass(score) {
+        score = parseFloat(score)
+        if (score >= 80) return 'score-high'
+        if (score >= 50) return 'score-medium'
+        return 'score-low'
+      }
+    </script>
+  </body>
+</html>
