@@ -5,15 +5,17 @@
   "type": "module",
   "main": "analyze-snapshots.js",
   "scripts": {
-    "analyze": "node analyze-snapshots.js",
-    "test": "node analyze-snapshots.js --before ./html/inboxA.html --after ./html/inboxB.html"
+    "analyze:inbox": "node analyze-snapshots.js --inbox",
+    "analyze:read": "node analyze-snapshots.js --read",
+    "analyze:write": "node analyze-snapshots.js --write"
   },
   "dependencies": {
+    "commander": "^13.1.0",
     "jsdom": "^26.1.0"
   },
   "author": "",
   "license": "MIT",
   "engines": {
-    "node": ">=14.0.0"
+    "node": "22.13.1"
   }
 }

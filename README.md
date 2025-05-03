@@ -24,15 +24,6 @@ This tool helps developers maintain compatibility with Outlook's web interface b
 
 ### Command Line
 
-```bash
-# Using npm scripts
-npm run analyze      # Run with default files (inboxA.html and inboxB.html)
-npm run test            # Run with specific test files
-
-# Direct usage
-node analyze-snapshots.js --before ./html/readA.html --after ./html/readB.html
-```
-
 ### Browser Interface
 
 1. Open index.html in your browser

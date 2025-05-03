@@ -9,6 +9,7 @@
 
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { Command } from 'commander'
 import OutlookDOMDiff from './analyzers/dom-diff.js'
 import { loadHTMLFile, saveResults, generateHTMLReport } from './utils/file-utils.js'
 
@@ -26,11 +27,36 @@ function toProjectPath(absolutePath) {
 
 /**
  * Main function to run the analysis
+ * @param {Object} options - Command line options
  */
-async function main() {
+async function runAnalysis(options) {
   try {
-    // Parse command line arguments
-    const { beforePath, afterPath, outputJsonPath, outputHtmlPath } = parseArgs()
+    // Determine which files to analyze based on the mode
+    let beforePath, afterPath
+
+    if (options.inbox) {
+      beforePath = path.resolve(__dirname, 'html/inbox-A.html')
+      afterPath = path.resolve(__dirname, 'html/inbox-B.html')
+    } else if (options.read) {
+      beforePath = path.resolve(__dirname, 'html/read-A.html')
+      afterPath = path.resolve(__dirname, 'html/read-B.html')
+    } else if (options.write) {
+      beforePath = path.resolve(__dirname, 'html/write-A.html')
+      afterPath = path.resolve(__dirname, 'html/write-B.html')
+    } else {
+      // Default to inbox if no specific mode is selected
+      beforePath = path.resolve(__dirname, 'html/inbox-A.html')
+      afterPath = path.resolve(__dirname, 'html/inbox-B.html')
+    }
+
+    // Use custom output paths if specified
+    const outputJsonPath = options.outputJson
+      ? path.resolve(options.outputJson)
+      : path.resolve(__dirname, 'output/analysis-results.json')
+
+    const outputHtmlPath = options.outputHtml
+      ? path.resolve(options.outputHtml)
+      : path.resolve(__dirname, 'output/analysis-report.html')
 
     console.log('Starting Outlook HTML snapshot differential analysis of:')
     console.log(`  - before-update file: ${toProjectPath(beforePath)}`)
@@ -77,90 +103,24 @@ function analyzeSnapshots(beforeHTML, afterHTML) {
   }
 }
 
-/**
- * Parse command line arguments
- * @returns {Object} Parsed arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2)
+// Set up Commander
+const program = new Command()
 
-  // Default paths
-  let beforePath = path.resolve(__dirname, 'html/inboxA.html')
-  let afterPath = path.resolve(__dirname, 'html/inboxB.html')
-  let outputJsonPath = path.resolve(__dirname, 'output/analysis-results.json')
-  let outputHtmlPath = path.resolve(__dirname, 'output/analysis-report.html')
+program
+  .name('analyze-snapshots')
+  .description('Analyze differences between Outlook HTML snapshots')
+  .version('1.0.0')
+  .option('--inbox', 'Analyze inbox mode snapshots (inbox-A.html and inbox-B.html)')
+  .option('--read', 'Analyze read mode snapshots (read-A.html and read-B.html)')
+  .option('--write', 'Analyze compose mode snapshots (write-A.html and write-B.html)')
+  .option('--output-json <path>', 'Path to save the analysis results as JSON')
+  .option('--output-html <path>', 'Path to save the HTML report')
+  .parse(process.argv)
 
-  // Parse arguments
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--before':
-        beforePath = args[++i]
-        break
-      case '--after':
-        afterPath = args[++i]
-        break
-      case '--output-json':
-        outputJsonPath = args[++i]
-        break
-      case '--output-html':
-        outputHtmlPath = args[++i]
-        break
-      case '--help':
-        showHelp()
-        process.exit(0)
-      default:
-        // If first two arguments without flags, assume they are before and after paths
-        if (i === 0 && !args[i].startsWith('--')) {
-          beforePath = args[i]
-        } else if (i === 1 && !args[i].startsWith('--')) {
-          afterPath = args[i]
-        }
-    }
-  }
+const options = program.opts()
 
-  return {
-    beforePath: path.resolve(beforePath),
-    afterPath: path.resolve(afterPath),
-    outputJsonPath: path.resolve(outputJsonPath),
-    outputHtmlPath: path.resolve(outputHtmlPath),
-  }
-}
-
-/**
- * Show help message
- */
-function showHelp() {
-  console.log(`
-Outlook HTML Snapshot Analyzer
-
-Usage:
-  analyze-snapshots [options]
-  analyze-snapshots [beforeHtml] [afterHtml]
-
-Options:
-  --before <path>        Path to the 'before' HTML snapshot file
-                         Default: html/inboxA.html
-                         
-  --after <path>         Path to the 'after' HTML snapshot file
-                         Default: html/inboxB.html
-                         
-  --output-json <path>   Path to save the analysis results as JSON
-                         Default: output/analysis-results.json
-                         
-  --output-html <path>   Path to save the HTML report
-                         Default: output/analysis-report.html
-                         
-  --help                 Show this help message
-
-Examples:
-  analyze-snapshots
-  analyze-snapshots --before html/v1.html --after html/v2.html
-  analyze-snapshots --output-json ./my-results.json
-  `)
-}
-
-// Execute main function
-main().catch(error => {
+// Execute main function with parsed options
+runAnalysis(options).catch(error => {
   console.error('Unexpected error:', error)
   process.exit(1)
 })
