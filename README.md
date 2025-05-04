@@ -14,7 +14,9 @@ This tool helps developers maintain compatibility with Outlook's web interface b
 - Create detailed HTML reports of analysis results
 - Runs in two modes:
   - npm command line scripts
+    > Recommend for quick analysis of predefined files
   - browser-based interactive diff visualization
+    > More robust option for analysis of any selected files
 
 ## Installation
 
