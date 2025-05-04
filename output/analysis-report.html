@@ -25,9 +25,9 @@
 <body>
   <h1>Outlook HTML Snapshot Comparison</h1>
   <div class="report-meta">
-    <p><strong>Before:</strong> inboxA.html</p>
-    <p><strong>After:</strong> inboxB.html</p>
-    <p><strong>Generated:</strong> 2025-05-03, 11:39:06 a.m.</p>
+    <p><strong>Before:</strong> write-A.html</p>
+    <p><strong>After:</strong> write-B.html</p>
+    <p><strong>Generated:</strong> 2025-05-03, 4:34:54 p.m.</p>
   </div>
 
   <div class="report-section">
@@ -43,41 +43,41 @@
       
         <tr>
           <td>id</td>
-          <td>130</td>
-          <td>130</td>
-          <td>130</td>
+          <td>215</td>
+          <td>215</td>
+          <td>215</td>
           <td class="score-high">100.00%</td>
         </tr>
       
         <tr>
           <td>class</td>
-          <td>286</td>
-          <td>286</td>
-          <td>286</td>
+          <td>351</td>
+          <td>351</td>
+          <td>351</td>
           <td class="score-high">100.00%</td>
         </tr>
       
         <tr>
           <td>data-testid</td>
-          <td>1</td>
-          <td>1</td>
-          <td>1</td>
+          <td>2</td>
+          <td>2</td>
+          <td>2</td>
           <td class="score-high">100.00%</td>
         </tr>
       
         <tr>
           <td>role</td>
-          <td>26</td>
-          <td>26</td>
-          <td>26</td>
+          <td>28</td>
+          <td>28</td>
+          <td>28</td>
           <td class="score-high">100.00%</td>
         </tr>
       
         <tr>
           <td>aria-label</td>
-          <td>58</td>
-          <td>58</td>
-          <td>58</td>
+          <td>86</td>
+          <td>86</td>
+          <td>86</td>
           <td class="score-high">100.00%</td>
         </tr>
       
@@ -128,7 +128,8 @@
       <div>
         <h4>data-testid (top 10)</h4>
         <pre>[
-  "local-computer-filein"
+  "local-computer-filein",
+  "ComposeSendButton"
 ]</pre>
       </div>
     
@@ -233,9 +234,9 @@
       
         <tr>
           <td>ReadingPane</td>
-          <td>None found</td>
-          <td class="score-low">0</td>
-          <td>none</td>
+          <td>[aria-label*="Reading Pane"]</td>
+          <td class="score-high">90</td>
+          <td>primary</td>
           <td>
             <pre>[
   ".readingPane"
@@ -249,13 +250,15 @@
   <div class="report-section">
     <h2>Summary</h2>
     <p>This analysis identified 0 changed selectors and 
-       1 reliable anchor points
+       2 reliable anchor points
        between the before and after snapshots.</p>
     
     <h3>Recommendations</h3>
     <ul>
       
           <li>Use <code class="highlight">[role="tree"]</code> as a reliable selector for FolderTree</li>
+        
+          <li>Use <code class="highlight">[aria-label*="Reading Pane"]</code> as a reliable selector for ReadingPane</li>
         
     </ul>
   </div>
