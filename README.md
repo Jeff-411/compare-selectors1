@@ -24,14 +24,34 @@ This tool helps developers maintain compatibility with Outlook's web interface b
 
 ### Command Line
 
-```bash
-# Using npm scripts
-npm run analyze      # Run with default files (inboxA.html and inboxB.html)
-npm run test            # Run with specific test files
+The analyzer provides three dedicated npm scripts to process each of the three main Outlook UI modes:
 
-# Direct usage
-node analyze-snapshots.js --before ./html/readA.html --after ./html/readB.html
+```bash
+# Analyze inbox mode UI snapshots
+npm run analyze:inbox
+
+# Analyze reading pane mode UI snapshots
+npm run analyze:read
+
+# Analyze compose mode UI snapshots
+npm run analyze:write
 ```
+
+You can also run the analyzer directly with additional options:
+
+```bash
+node analyze-snapshots.js --inbox --output-json custom-results.json --output-html custom-report.html
+```
+
+**Available options:**
+
+- `--inbox`: Compare inbox-A.html with inbox-B.html (default mode if none specified)
+- `--read`: Compare read-A.html with read-B.html
+- `--write`: Compare write-A.html with write-B.html
+- `--output-json <path>`: Specify custom path for JSON results (default: output/analysis-results.json)
+- `--output-html <path>`: Specify custom path for HTML report (default: output/analysis-report.html)
+
+By default, the tool uses HTML snapshots from the `html/` directory and saves results to the `output/` directory.
 
 ### Browser Interface
 
