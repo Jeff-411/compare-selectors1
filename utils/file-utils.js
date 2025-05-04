@@ -156,20 +156,34 @@ export async function generateHTMLReport(results, beforePath, afterPath, outputP
       <tr>
         <th>Element</th>
         <th>Status</th>
-        <th>Before Selector</th>
-        <th>After Selector</th>
+        <th>Before</th>
+        <th>After</th>
       </tr>
       ${results.changedSelectors
-        .map(
-          change => `
-        <tr>
-          <td>${change.elementName}</td>
-          <td class="status-${change.status}">${change.status}</td>
-          <td>${change.before.found ? change.before.selector : 'N/A'}</td>
-          <td>${change.after.found ? change.after.selector : 'N/A'}</td>
-        </tr>
-      `
-        )
+        .map(change => {
+          // Handle both formats (browser and Node.js versions)
+          if (change.before && change.after) {
+            // Browser format
+            return `
+            <tr>
+              <td>${change.elementName || 'Element'}</td>
+              <td class="status-${change.status}">${change.status}</td>
+              <td>${change.before.found ? change.before.selector : 'N/A'}</td>
+              <td>${change.after.found ? change.after.selector : 'N/A'}</td>
+            </tr>
+            `
+          } else {
+            // Node.js format
+            return `
+            <tr>
+              <td>${change.selector || 'Element'}</td>
+              <td class="status-${change.change}">${change.change}</td>
+              <td>${change.beforeCount !== undefined ? change.beforeCount : 'N/A'}</td>
+              <td>${change.afterCount !== undefined ? change.afterCount : 'N/A'}</td>
+            </tr>
+            `
+          }
+        })
         .join('')}
     </table>
   </div>

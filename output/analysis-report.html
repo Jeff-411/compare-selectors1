@@ -25,9 +25,9 @@
 <body>
   <h1>Outlook HTML Snapshot Comparison</h1>
   <div class="report-meta">
-    <p><strong>Before:</strong> write-A.html</p>
-    <p><strong>After:</strong> write-B.html</p>
-    <p><strong>Generated:</strong> 2025-05-03, 4:34:54 p.m.</p>
+    <p><strong>Before:</strong> inbox-A.html</p>
+    <p><strong>After:</strong> inbox-B.html</p>
+    <p><strong>Generated:</strong> 2025-05-04, 6:52:45 a.m.</p>
   </div>
 
   <div class="report-section">
@@ -43,42 +43,42 @@
       
         <tr>
           <td>id</td>
-          <td>215</td>
-          <td>215</td>
-          <td>215</td>
-          <td class="score-high">100.00%</td>
+          <td>130</td>
+          <td>141</td>
+          <td>106</td>
+          <td class="score-high">81.54%</td>
         </tr>
       
         <tr>
           <td>class</td>
-          <td>351</td>
-          <td>351</td>
-          <td>351</td>
-          <td class="score-high">100.00%</td>
+          <td>286</td>
+          <td>289</td>
+          <td>262</td>
+          <td class="score-high">91.61%</td>
         </tr>
       
         <tr>
           <td>data-testid</td>
-          <td>2</td>
-          <td>2</td>
-          <td>2</td>
+          <td>1</td>
+          <td>1</td>
+          <td>1</td>
           <td class="score-high">100.00%</td>
         </tr>
       
         <tr>
           <td>role</td>
-          <td>28</td>
-          <td>28</td>
-          <td>28</td>
+          <td>26</td>
+          <td>26</td>
+          <td>26</td>
           <td class="score-high">100.00%</td>
         </tr>
       
         <tr>
           <td>aria-label</td>
-          <td>86</td>
-          <td>86</td>
-          <td>86</td>
-          <td class="score-high">100.00%</td>
+          <td>58</td>
+          <td>67</td>
+          <td>57</td>
+          <td class="score-high">98.28%</td>
         </tr>
       
         <tr>
@@ -99,13 +99,13 @@
   "app",
   "appContainer",
   "id__4",
-  "sender-address",
-  "custom_menu-left",
-  "trigger-navpane",
-  "trigger-leftRail",
-  "custom_menu-top",
-  "trigger-ribbon",
-  "trigger-siteHeader"
+  "OwaTitleBar",
+  "o365header",
+  "O365_NavHeader",
+  "O365_HeaderLeftRegion",
+  "O365_MainLink_NavMenu",
+  "CenterRegion",
+  "Region_0"
 ]</pre>
       </div>
     
@@ -118,18 +118,17 @@
   "ms-Button-flexContainer flexContainer-159",
   "ms-Button-textContainer textContainer-160",
   "ms-Button-label label-162",
-  "custom-trigger-left",
-  "custom-trigger-top",
-  "M7RMk624fi5g/EJCqDnwxQ== hideMe",
-  "dQ8XLMIyNxl8MAYqMsUZFQ== o365cs-base o365sx-navbar o365sx-search"
+  "dQ8XLMIyNxl8MAYqMsUZFQ== o365cs-base o365sx-navbar o365sx-search",
+  "ieRo/OqPYB7kffRFKx2c9w==",
+  "Bh46b1rd8BrU4zolL9RzUg==",
+  "clgiLVKPzugZZns0LiPTqw== o365sx-button o365sx-waffle"
 ]</pre>
       </div>
     
       <div>
         <h4>data-testid (top 10)</h4>
         <pre>[
-  "local-computer-filein",
-  "ComposeSendButton"
+  "local-computer-filein"
 ]</pre>
       </div>
     
@@ -178,10 +177,17 @@
       <tr>
         <th>Element</th>
         <th>Status</th>
-        <th>Before Selector</th>
-        <th>After Selector</th>
+        <th>Before</th>
+        <th>After</th>
       </tr>
       
+            <tr>
+              <td>[role="option"]</td>
+              <td class="status-increased">increased</td>
+              <td>1</td>
+              <td>2</td>
+            </tr>
+            
     </table>
   </div>
 
@@ -234,9 +240,9 @@
       
         <tr>
           <td>ReadingPane</td>
-          <td>[aria-label*="Reading Pane"]</td>
-          <td class="score-high">90</td>
-          <td>primary</td>
+          <td>None found</td>
+          <td class="score-low">0</td>
+          <td>none</td>
           <td>
             <pre>[
   ".readingPane"
@@ -249,16 +255,14 @@
 
   <div class="report-section">
     <h2>Summary</h2>
-    <p>This analysis identified 0 changed selectors and 
-       2 reliable anchor points
+    <p>This analysis identified 1 changed selectors and 
+       1 reliable anchor points
        between the before and after snapshots.</p>
     
     <h3>Recommendations</h3>
     <ul>
       
           <li>Use <code class="highlight">[role="tree"]</code> as a reliable selector for FolderTree</li>
-        
-          <li>Use <code class="highlight">[aria-label*="Reading Pane"]</code> as a reliable selector for ReadingPane</li>
         
     </ul>
   </div>
